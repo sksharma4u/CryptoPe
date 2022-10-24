@@ -14,6 +14,18 @@ const app = require('./app');
 
 const dotenv = require('dotenv'); //So to change the PORT we can use Dotenv
 const connectDatabase = require("./config/database");
+
+// Handling Uncaught Exception
+
+
+process.on("uncaughtException", (err) => {
+    console.log(`Error : ${err.message}`);
+    console.log(`Shutting down the server due to unhandled promise Rejection`);
+    process.exit(1);
+
+})
+
+
 //config
 
 dotenv.config({ path: "backend/config/config.env" }); //Here we give the path of config file 
@@ -22,6 +34,17 @@ dotenv.config({ path: "backend/config/config.env" }); //Here we give the path of
 
 connectDatabase();
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
     console.log(`Server is working on http://localhost:${process.env.PORT}`); //To read and parse the .env file and access the data it contains via the process.env global
+})
+
+//unhandled promise rejection 
+
+process.on("unhandledRejection", err => {
+    console.log(`Error : ${err.message}`);
+    console.log(`Shutting down the server due to unhandled promise Rejection`);
+
+    server.close(() => {
+        process.exit(1);
+    });
 })
