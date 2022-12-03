@@ -3,6 +3,7 @@ const validator = require("validator");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -64,5 +65,26 @@ userSchema.methods.getJWTToken = function() {
 
 userSchema.methods.comparePassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
+}
+
+
+// Generating Password Reset Token
+
+userSchema.methods.getResetPasswordToken = function() {
+    //Generating Token - With the help of Crypto
+    // So here we use toString("hex") to convert the token into readable form like 400n44j30033b007
+
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    //Hashing and adding resetPasswordToken to userSchema
+    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex")
+
+    // without using hex it shows buffer value in output
+
+    //So here we set the time limit that  how much time my new password token is not expire
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // Convert into millisecond
+    return resetToken;
+
 }
 module.exports = mongoose.model("User", userSchema);

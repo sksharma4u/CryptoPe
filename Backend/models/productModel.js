@@ -32,7 +32,7 @@ const productSchema = mongoose.Schema({
     }],
     category: {
         type: String,
-        requires: [true, "Please Enteer product Category"],
+        requires: [true, "Please Enter product Category"],
     },
     Stock: {
         type: Number,
@@ -59,6 +59,12 @@ const productSchema = mongoose.Schema({
             required: true
         }
     }],
+
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now
